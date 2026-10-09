@@ -1,0 +1,40 @@
+# ---- 编辑器 / 系统垃圾 ----
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- 编译产物 ----
+chi2FoM/chi2
+*.o
+*.so
+*.d
+
+# ---- BESIII 数据与作业日志（绝不入库）----
+*.root
+*.dst
+*.rtraw
+*.bosslog
+*.bosserr
+*.tar.gz
+
+# ---- 作业运行时产物 ----
+temp.txt
+errorfile.txt
+checked.txt
+number.txt
+filename.txt
+jobOptions_*.txt
+again/
+figs/
+
+# ---- 备份文件 ----
+*.backup

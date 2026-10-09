@@ -1,0 +1,34 @@
+#!/bin/tcsh -f
+# Version:  0.01
+# Author:   Xiang Zhou
+# Date:     2020-04-16
+
+if ( $#argv == 1 ) then
+		  set cfgFile       = $argv[1]
+else
+		  echo "please append corrected arguments"
+		  exit 0
+endif
+
+if ( ! $?BES_RELEASE ) then
+		  # get the USERID
+		  set NAME = $USER
+		  # get the first letter of UserID
+		  set firstLetter = `echo $NAME | cut -c1-1`
+		  # This code need g++ version >= 4.6.3,  which can be got after run  boss700
+		  source /afs/ihep.ac.cn/users/${firstLetter}/${NAME}/bin/bossbin/boss700
+endif
+
+set workWD = /workfs/bes/zhoux/chi2FoM
+#echo "cfgFile = $cfgFile"
+if ($cfgFile == --help || $cfgFile == -h) then
+		  echo "    chi2FoM --prepare" 
+		  echo "    Modify Example.cfg as your wish and/or rename it, for example, MyConfig.cfg" 
+		  echo "    chi2FoM Example.cfg or PrintIt MyConfig.cfg" 
+else if ($cfgFile == --prepare) then
+		  cp -f /workfs/bes/zhoux/chi2FoM/Example.cfg .
+		  echo "Example configuaretion file Example.cfg is prepared!" 
+else
+		  $workWD/chi2 $cfgFile 
+endif
+

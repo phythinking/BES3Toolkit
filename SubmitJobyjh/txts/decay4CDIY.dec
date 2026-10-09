@@ -1,0 +1,11 @@
+
+Decay psi(2S)
+1.0000   Lambda_c+ anti-p-                   PHSP;
+Enddecay
+
+Decay Lambda_c+
+1.0000 p+ K- pi+				Lambdac2pKpi;
+Enddecay	 
+
+End
+

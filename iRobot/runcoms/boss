@@ -1,0 +1,15 @@
+#!/bin/tcsh -f
+
+setenv ver BOSSVERSION 
+######## set cvs
+#setenv CVS_RSH "/usr/bin/ssh"
+#setenv CVSROOT ':pserver:USERID@koala.ihep.ac.cn:/bes/bes'
+#echo '--------for boss ${ver} build  environments ---'
+
+#source /workfs/bes/USERID/cmthome/cmthome-${ver}/setupCVS.csh
+source /workfs2/bes/USERID/cmthome/cmthome-${ver}/setupCMT.csh
+source /workfs2/bes/USERID/cmthome/cmthome-${ver}/setup.csh
+source /workfs2/bes/USERID/work.${ver}/TestRelease/*/cmt/setup.csh
+#echo 'CMTPATH:   '$CMTPATH
+#echo 'CMTROOT:   '$CMTROOT $CMTBIN
+echo "Welcome to BOSS ${ver}"

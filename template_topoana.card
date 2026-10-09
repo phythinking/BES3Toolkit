@@ -1,0 +1,317 @@
+# In the card, "#", "%", and the pair of "{" and "}" are used for commenting, prompting, and grouping, respectively.
+
+# The following two items are indispensable. They can't be removed or left empty.
+
+# One file per line without tailing characters, such as comma, semicolon, and period. In addition, wildcards "[]?*" are supported in the item just like in the method Add() of the class TChain. Besides, both the absolute and relative paths are supported in the item.
+% Names of input root files
+{
+ 
+}
+
+% TTree name
+{
+  
+}
+
+# The following thirty-two items are optional. They can be removed or left empty.
+
+# Here, AOI, VOI, MSI, and MSD are short for array of integers, vector of integers, multiple scalar integers, and multiple scalar doubles.
+% Storage type of input raw topology truth information (Four options: AOI, VOI, MSI, and MSD. Default: AOI)
+{
+
+}
+
+% TBranch name of the number of particles (Default: nMCGen)
+{
+
+}
+
+% TBranch name of the PDG codes of particles (Default: MCGenPDG)
+{
+
+}
+
+% TBranch name of the mother indices of particles (Default: MCGenMothIndex)
+{
+
+}
+
+% Component analysis --- decay trees
+{
+  Y 	100     Y  
+}
+
+% Component analysis --- decay initial-final states
+{
+  Y	100
+}
+
+# This item is used for the analysis of the decay branches of the following particles. The maximum numbers of decay branches to be printed for the particles can be optionally specified on their right sides.
+% Component analysis --- decay branches of particles
+{
+  D*+        Dsp       100
+  J/psi      Jpsi      100
+}
+
+# This item is used for the analysis of the production branches of the following particles. The maximum numbers of production branches to be printed for the particles can be optionally specified on their right sides.
+% Component analysis --- production branches of particles
+{
+  D*+        Dsp       100
+  J/psi      Jpsi      100
+}
+
+# This item is used for the analysis of the mothers of the following particles. The maximum numbers of mothers to be printed for the particles can be optionally specified on their right sides.
+% Component analysis --- mothers of particles
+{
+  D*+        Dsp       100
+  J/psi      Jpsi      100
+}
+
+% Component analysis --- cascade decay branches of particles
+{
+  B0	     B0	       100	2 
+  D0         D0        100	2
+}
+
+% Component analysis --- decay final states of particles
+{
+  B0         B0        100      3
+  D0         D0        100      3
+}
+
+# This item is used for the analysis of the exclusive components of the following inclusive decay branches. The maximum numbers of exclusive components to be printed for the inclusive decays can be optionally specified on the right sides of their heading particles.
+% Component analysis --- inclusive decay branches
+{
+  anti-B0 --> D*+ 	& 	B2Dsp  		&   100
+  B0 --> K_S0 		& 	B2Ks  		&   100
+}
+
+# This item is used for the analysis of the internal structures involved in the following intermediate-resonance-allowed decay branches. The maximum numbers of exclusive components to be printed for the intermediate-resonance-allowed decays can be optionally specified on the right sides of their heading particles.
+% Component analysis --- intermediate-resonance-allowed decay branches
+{
+  D*+ --> K- pi+ pi+ pi0	&	Dsp2K3Pi	&	100
+  J/psi --> pi+ pi- pi0		&	Jpsi23Pi	&	100
+}
+
+% Signal identification --- decay trees
+{
+  0	&	Upsilon(4S) --> B0 anti-B0		&       -1	&	1stDcyTrInTb2	& 	Y
+  1	&       B0 --> e+ nu_e D*- gammaF		&        0
+  2	&       anti-B0 --> mu- anti-nu_mu D*+		&        0
+  3	&       D*- --> pi- anti-D0			&        1
+  4	&       D*+ --> pi+ D0				&        2
+  5	&       anti-D0 --> pi0 pi- K+			&        3
+  6	&       D0 --> pi0 pi+ K-			&        4
+
+  0	&       Upsilon(4S) --> B0 anti-B0		&       -1	&	2ndDcyTrInTb2
+  1	&       B0 --> pi0 pi+ pi+ rho- D-		&        0
+  2	&       anti-B0 --> mu- anti-nu_mu D*+		&        0
+  3	&       rho- --> pi0 pi-			&        1
+  4	&       D- --> pi- pi- K+			&        1
+  5	&       D*+ --> pi+ D0				&        2	
+  6	&       D0 --> K_L0 pi+ pi-			&        5
+}
+
+% Signal identification --- decay initial-final states related to decay trees (Two options: Y and N. Default: N)
+{
+  Y
+}
+
+% Signal identification --- decay initial-final states
+{
+  Upsilon(4S) --> mu+ nu_mu 3 pi0 3 pi+ 4 pi- K+ K-             &       1stDcyIFStsInTb3
+  Upsilon(4S) --> 5 pi0 5 pi+ 5 pi- K+ K-                       &       2ndDcyIFStsInTb3
+}
+
+% Signal identification --- particles
+{
+  D*+		Dsp
+  J/psi		Jpsi 
+}
+
+% Signal identification --- decay branches
+{
+  anti-B0 --> D*+ mu- anti-nu_mu	&	B2munuDsp
+  B0 --> K_S0  J/psi			&	B2KsJpsi 
+}
+
+% Signal identification --- cascade decay branches
+{
+  0	&	B0 --> D*- D_s*+	      &	      -1
+  1	&	D*- --> pi- anti-D0	      &	       0
+  2	&	D_s*+ --> D_s+ gamma	      &	       0
+
+  0     &       B0 --> D*- D_s*+              &       -1
+  1     &       D*- --> pi- anti-D0           &        0  
+}
+
+% Signal identification --- inclusive decay branches
+{
+  anti-B0 --> D*+	&	B2Dsp
+  B0 --> K_S0		&	B2Ks
+}
+
+# The star symbol "*" can be used as a short version of the word "anything" in order to simplify your input. 
+% Signal identification --- inclusive cascade decay branches
+{
+  0     &       B0 --> D*- D_s*+              &       -1
+  1     &       D*- --> * anti-D0             &        0
+  2     &       D_s*+ --> D_s+ gamma          &        0
+
+  0     &       B0 --> D*- D_s*+              &       -1
+  1     &       D*- --> * anti-D0             &        0
+}
+
+% Signal identification --- intermediate-resonance-allowed decay branches 
+{
+  D*+ --> K- pi+ pi+ pi0 	&	Dsp2K3Pi 
+  J/psi --> pi+ pi- pi0 	&	Jpsi23Pi
+}
+
+% Fix the mother indices of particles in BESIII experiment (Two options: Y and N. Default: N)
+{
+
+}
+
+% Maximum number of entries to be processed
+{
+
+}
+
+# Only single-line cuts are supported in the item just like in the method Draw() and GetEntries() of the class TTree.
+% Cut to select entries
+{
+
+}
+
+# In the following item, T (F) means that true (false) as long as one instance is true (false).
+% Method to apply cut to array variables (Two options: T and F. Default: F)
+{
+
+}
+
+# The value inputted here should be a positive integer.
+% Maximum hierarchy of heading decay branches to be processed in each event
+{
+  
+}
+
+% Ignore the decay of the following particles
+{
+
+}
+
+% Ignore the decay of the daughters of the following particles
+{
+  
+}
+
+% Retain the decay of pi0 to gamma gamma (Two options: Y and N. Default: N)
+{
+
+}
+
+% Ignore the following final decay branches
+{
+
+}
+
+% PDG code of ISR photons (Default: 222222222)
+{
+
+}
+
+% PDG code of FSR photons (Default: -22)
+{
+
+}
+
+# In 'Ys' and 'Yg', 's' and 'g' are the initials of the words 'strict' and 'generalized', respectively. While strict ISR photons are marked beforehand with a special PDG code (222222222 by default), generalized ISR photons are defned as photons who have no mothers recorded in the arrays of the PDG codes and mother indices.
+% Ignore ISR photons (Three options: Ys, Yg and N. Default: N)
+{
+
+}
+
+# In 'Ys' and 'Yg', 's' and 'g' are the initials of the words 'strict' and 'generalized', respectively. While strict FSR photons are marked beforehand with a special PDG code (-22 by default), generalized FSR photons are defned as photons who have at least one e+, e-, mu+, mu-, pi+, pi-, K+, K-, p, or anti-p sister.
+% Ignore FSR photons (Three options: Ys, Yg and N. Default: N)
+{
+
+}
+
+% Avoid over counting for candidate based analysis (Two options: Y and N. Default: N)
+{
+
+}
+
+% Process charge conjugate objects together (Two options: Y and N. Default: N)
+{
+
+}
+
+% TBranch name of the indices of candidates in an event (Default: __candidate__)
+{
+
+}
+
+% Analysis tasks for signal identifications (Three options: TC, T and C. Default: TC)
+{
+
+}
+
+#by number of cases or entries from large to small
+% Sort the signals in the topology maps related to signal identifications (Two options: Y and N. Default: N)
+{
+
+}
+
+% Initial state particles (Default: e- e+)
+{
+   
+}
+
+# The option "Y" set up in the item comes into effect only in the cases that there are only three particles in the decay branches.
+% Push front the initial state particles uniformly in all the events (Two options: Y and N. Default: N)
+{
+
+}
+
+# Four files with the same name but in different (root/txt/tex/pdf) formats will be outputed. The filename extensions are appended automatically by the program as suffixes. Thus, to avoid repetition, any filename extension is not recommended to be used in the name as a suffix.
+% Common name of output files (Default: Name of the card file)
+{
+
+}
+
+% Complete horizontal and vertical lines in output pdf files (Two options: Y and N. Default: N)
+{
+
+}
+
+% Center decay objects in output pdf files (Two options: Y and N. Default: N)
+{
+
+}
+
+% One output root file by one input root file (Two options: Y and N. Default: N)
+{
+
+}
+
+% Maximum number of entries to be saved in a single output root file
+{
+
+}
+
+% Use array tbranches to store topology tags in output root files when possible (Two options: Y and N. Default: N)
+{
+
+}
+
+% Remove input tbranches from output root files (Two options: Y and N. Default: N)
+{
+  
+}
+
+% Verbose level of standard output (Two options: Y and N. Default: N)
+{
+
+}

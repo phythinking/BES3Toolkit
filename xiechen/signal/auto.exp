@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+
+set num_jobs [lindex $argv 0]
+set events_per_job [lindex $argv 1]
+
+spawn python3 script.py --simulate
+expect "Enter the number of Jobs:"
+send -- "$num_jobs\r"
+expect "Enter the simulated events in One Job:"
+send -- "$events_per_job\r"
+interact

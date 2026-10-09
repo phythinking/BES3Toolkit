@@ -1,0 +1,37 @@
+#include "$ROOTIOROOT/share/jobOptions_ReadRec.txt"
+#include "$MAGNETICFIELDROOT/share/MagneticField.txt"
+#include "$ABSCORROOT/share/jobOptions_AbsCor.txt"
+#include "$SIMPLEPIDSVCROOT/share/jobOptions_SimplePIDSvc.txt"
+#include "$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt"
+#include "$MEASUREDECMSSVCROOT/share/anaOptions.txt"
+
+ApplicationMgr.DLLs += {"modeAlg"};
+ApplicationMgr.TopAlg += { "mode" };
+
+// NOTE (public release): the real run ranges have been removed.
+// Full configuration is available at /workfs2/bes/yangjunhui/BES3Toolkit
+// Please fill in your own run numbers below.
+Int_t RUN_FROM = 0;
+Int_t RUN_TO   = 0;
+
+MeasuredEcmsSvc.ReadOneTime = true;
+MeasuredEcmsSvc.RunFrom = RUN_FROM;
+MeasuredEcmsSvc.RunTo = RUN_TO;
+
+VertexDbSvc.ReadOneTime = true;
+VertexDbSvc.RunFrom = RUN_FROM;
+VertexDbSvc.RunTo = RUN_TO;
+
+MagneticFieldSvc.ReadOneTime = true;
+MagneticFieldSvc.RunFrom = RUN_FROM;
+MagneticFieldSvc.RunTo = RUN_TO;
+
+mode.UseCalibEnergy = true;
+mode.ReadBeamEFromDB = true;
+mode.BeamEnergy = 2.11277;
+
+mode.mctag = 1;
+mode.mcnumber = MCNUMBER;
+
+// Input REC or DST file name 
+EventCnvSvc.digiRootInputFile = { 
