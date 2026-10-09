@@ -41,16 +41,14 @@
   - [1. setupBOSSyjh —— BOSS 环境安装](#1-setupbossyjh--boss-环境安装)
   - [2. creatAlgyjh —— 派生分析算法包](#2-creatalgyjh--派生分析算法包)
   - [3. SubmitJobyjh —— 作业机器人](#3-submitjobyjh--作业机器人)
-  - [4. iRobot —— WALL·E（Python 版）](#4-irobot--wallepython-版)
-  - [5. checktool —— 作业体检与重投](#5-checktool--作业体检与重投)
-  - [6. DrawTool —— 绘图](#6-drawtool--绘图)
-  - [7. fitkit —— 拟合](#7-fitkit--拟合)
-  - [8. chi2FoM —— χ² 扫描与 cut 优化](#8-chi2fom--χ²-扫描与-cut-优化)
-  - [9. inclusive / xiechen —— 作业模板](#9-inclusive--xiechen--作业模板)
-  - [10. template_topoana.card —— TopoAna 配置](#10-template_topoanacard--topoana-配置)
+  - [4. checktool —— 作业体检与重投](#4-checktool--作业体检与重投)
+  - [5. DrawTool —— 绘图](#5-drawtool--绘图)
+  - [6. fitkit —— 拟合](#6-fitkit--拟合)
+  - [7. chi2FoM —— χ² 扫描与 cut 优化](#7-chi2fom--χ²-扫描与-cut-优化)
+  - [8. inclusive —— 作业模板](#8-inclusive--作业模板)
+  - [9. template_topoana.card —— TopoAna 配置](#9-template_topoanacard--topoana-配置)
 - [使用前必须修改的配置](#使用前必须修改的配置)
 - [依赖](#依赖)
-- [已验证 / 未验证](#已验证--未验证)
 - [已知问题与后续计划](#已知问题与后续计划)
 - [致谢](#致谢)
 - [License 与免责声明](#license-与免责声明)
@@ -70,19 +68,11 @@
 
 因此本工具箱把这些流程封装成了几个可复用的脚本与命令行工具。
 
-### 三个"机器人"的关系
+### 关于"机器人"的名字
 
-工具箱里有三代同源的工具，命名都来自皮克斯动画《WALL·E》：
+作业提交工具内部自称 **jarvis**，`welcome.sh` 会出现 *"I'm jarvis"*，而报错信息里又会冒出 *Wall.E*，入口符号链接则叫 `iRobot` —— 这是命名一路演化留下的痕迹（最初是 tcsh 的 *iRobot*，后来改成 Bash 的 *jarvis*，中间还有过一版 Python 的 *WALL·E*，现已移除）。**它们指的都是同一个作业提交工具。**
 
-| 名字 | 位置 | 时代 | 状态 |
-|---|---|---|---|
-| **jarvis** | `SubmitJobyjh/.Robot_1.00.sh` | 2023 | ✅ 当前主力（Bash） |
-| **WALL·E** | `iRobot/` | 2020–2022 | ⚠️ 已被 Bash 版取代，存档 |
-| **EVE** | 无代码模块 | — | 代码里指"下命令的人"（即用户） |
-
-> 代码中写明：`WALL·E = Waste Allocation Load Lifter Earth-Class`（工具集自身），`EVE = Extraterrestrial Vegetation Evaluator`（使用者）。`WALLE.py` 打招呼时会问 *"Where is EVE?"*
-
-> **代码血统**：`iRobot/` 与 `chi2FoM/chi2.C` 的原始框架来自 **Dr. ZHOU Xiang（周翔，武汉大学）**；`bes3plotstyle.{C,h}` 来自 BESIII 官方绘图风格脚本（Niklaus Berger）；`setupBOSSyjh`、`creatAlgyjh`、`SubmitJobyjh`、`checktool`、`fitkit`、`inclusive` 为在此基础上改写、重写或新写的部分。详见 [致谢](#致谢)。
+> **代码血统**：`chi2FoM/chi2.C` 的原始框架来自 **Dr. ZHOU Xiang（周翔，武汉大学）**；`bes3plotstyle.{C,h}` 来自 BESIII 官方绘图风格脚本（Niklaus Berger）；`setupBOSSyjh`、`creatAlgyjh`、`SubmitJobyjh`、`checktool`、`fitkit`、`inclusive` 为在此基础上改写、重写或新写的部分。详见 [致谢](#致谢)。
 
 ---
 
@@ -91,15 +81,13 @@
 | 模块 | 语言 | 一句话说明 | 入口 |
 |---|---|---|---|
 | [`setupBOSSyjh/`](setupBOSSyjh/) | Bash | 一键安装并配置 BOSS（CMT + TestRelease + `boss<ver>` 启动脚本） | `./setupBOSS <ver>` |
-| [`creatAlgyjh/`](creatalgyjh/) | Bash | 从已有算法包派生新的分析算法包，自动改名并编译 | `./creatAlg ...` |
+| [`creatAlgyjh/`](creatAlgyjh/) | Bash | 从已有算法包派生新的分析算法包，自动改名并编译 | `./creatAlg ...` |
 | [`SubmitJobyjh/`](SubmitJobyjh/) | Bash | 批量生成 + 提交 sim/rec/ana/inc/data 作业，带状态机防重复提交 | `./iRobot` |
-| [`iRobot/`](iRobot/) | Python 3 | 上一代的 Python 面向对象重写版（环境检测 / 装 BOSS / 建包 / 编译） | `python3 apps/WALLE_*.py` |
 | [`checktool/`](checktool/) | Bash / C++ | 作业日志体检、失败作业重投、错误文件收集、事例数汇总 | `bash *.sh` |
 | [`DrawTool/`](DrawTool/) | ROOT C++ | 绘图宏 + BESIII 官方绘图风格（`bes3plotstyle`） | ROOT 宏 |
 | [`fitkit/`](fitkit/) | ROOT / RooFit | 一维、二维、无 bin 拟合模板 | ROOT 宏 |
 | [`chi2FoM/`](chi2FoM/) | C++ / ROOT | 基于 χ² 扫描的 cut 优化与 Figure-of-Merit 评估 | `./chi2FoM cfg` |
 | [`inclusive/`](inclusive/) | Bash | 12 个能量点的 inclusive MC 分析批量生产模板 | `./generate.sh` |
-| [`xiechen/`](xiechen/) | Bash / Python | 信号 MC（3φ 能量扫描）与 inclusive 作业模板 | `python3 script.py` |
 | [`template_topoana.card`](template_topoana.card) | — | TopoAna 拓扑分析配置文件模板 | 配置文件 |
 
 ---
@@ -122,58 +110,46 @@ BES3Toolkit/
 │   └── .scripts/                      #    公共函数
 │
 ├── SubmitJobyjh/                      # ③ 作业机器人（Bash）
-│   ├── iRobot -> .Robot_1.00.sh             ← 入口（符号链接，注意与 ../iRobot/ 同名）
+│   ├── iRobot -> .Robot_1.00.sh             ← 入口（符号链接）
 │   ├── .Robot_1.00.sh                 #    主脚本（内部自称 jarvis）
 │   ├── ReadMe                         #    原始简短说明
 │   ├── .scripts/                      #    作业生成与提交的核心逻辑
 │   ├── txts/                          #    用户配置 + sim/rec/ana jobOption 模板
 │   └── script.py                      #    作业脚本生成器（实验性）
 │
-├── iRobot/                            # ④ WALL·E（Python 3，存档）
-│   ├── classes/                       #    Environments / Preferences / Toolkit / SetupBOSS ...
-│   ├── apps/                          #    各功能的 CLI 入口
-│   ├── runcoms/                       #    boss / tcshrc / vimrc 运行环境模板
-│   ├── images/                        #    WALL·E / EVE 图标
-│   └── misc/                          #    备份
-│
-├── checktool/                         # ⑤ 作业体检
+├── checktool/                         # ④ 作业体检
 │   ├── checkjoberr.sh                 #    扫描 *.bosslog，列出未成功完成的作业
 │   ├── cperrorfile.sh                 #    把 errorfile.txt 中的日志集中拷贝到 ./again/
 │   ├── resubjob.py / resubjob.sh      #    把剩余 dst 重新均分生成 jobOptions
 │   ├── countnumber.sh                 #    汇总各 cut 阶段的事例数
 │   └── extract.cxx                    #    ROOT 宏：按 cut 从 TTree 抽取子样本
 │
-├── DrawTool/                          # ⑥ 绘图
+├── DrawTool/                          # ⑤ 绘图
 │   ├── draw.C / draw2D.C              #    一维 / 二维分布绘制示例
 │   ├── extract.cxx                    #    按表达式裁剪 TTree
 │   ├── bes3plotstyle.{C,h}            #    BESIII 官方绘图风格
 │   └── drawtool/                      #    更完整的绘图框架（需外部 ana.C）
 │
-├── fitkit/                            # ⑦ 拟合
+├── fitkit/                            # ⑥ 拟合
 │   ├── fit_1D.cxx / fit_2D.cxx        #    一维 / 二维拟合
 │   ├── testfit.cxx                    #    最小可运行的一维三分量拟合样例
 │   ├── fit2D_test.cxx                 #    二维非分 bin（最新最完整）
 │   ├── D_fit_unbin.cxx                #    双 D mBC 二维无 bin 拟合 ⚠️ 缺头文件
 │   └── 2D_sim_fit.cxx                 #    二维同时拟合 ⚠️ 缺头文件
 │
-├── chi2FoM/                           # ⑧ χ² 扫描与 cut 优化
+├── chi2FoM/                           # ⑦ χ² 扫描与 cut 优化
 │   ├── chi2.C                         #    主程序源码
 │   ├── config.{cc,hh}                 #    通用配置文件解析器
 │   ├── userDefined.h                  #    工具函数
 │   ├── Example.cfg                    #    配置文件示例
 │   ├── compile.sh                     #    g++ 编译脚本
-│   ├── chi2                           #    ⚠️ 预编译二进制（不建议入库）
 │   └── chi2FoM                        #    tcsh 包装脚本
 │
-├── inclusive/                         # ⑨ inclusive MC 模板（12 个能量点）
+├── inclusive/                         # ⑧ inclusive MC 模板（12 个能量点）
 │   ├── generate.sh                    #    总调度：遍历所有能量点
 │   └── 4130 … 4230-scan/              #    每点一套 MC_01..MC_40 / mc1..mc22
 │
-├── xiechen/                           # ⑩ 信号 MC 与 inclusive 模板
-│   ├── signal/                        #    3φ 能量扫描信号 MC（script.py + expect）
-│   └── inclusive/                     #    ⚠️ 与 inclusive/ 内容完全一致（历史副本）
-│
-└── template_topoana.card              # ⑪ TopoAna 拓扑分析配置模板
+└── template_topoana.card              # ⑨ TopoAna 拓扑分析配置模板
 ```
 
 ---
@@ -190,11 +166,10 @@ BES3Toolkit/
 | 文件系统 | `/workfs2/bes/$USER`、`/scratchfs/bes/$USER`、`/besfs5/users/$USER` 可写 |
 | CVMFS | `/cvmfs/bes3.ihep.ac.cn/` 已挂载（提供 BOSS 与 cmthome） |
 | 作业系统 | `hep_sub` / `hep_q`（`/afs/ihep.ac.cn/soft/common/sysgroup/hep_job/bin`）、`boss.condor`（HTCondor 的 BOSS 包装） |
-| Shell | 主脚本为 **bash**；`chi2FoM` 包装脚本与 `iRobot/runcoms/tcshrc` 为 **tcsh** |
+| Shell | 主脚本为 **bash**；`chi2FoM` 包装脚本为 **tcsh** |
 | 编译器 | `g++ >= 4.6.3`（`boss700` 之后的环境满足） |
-| Python | **Python 3.6+**（仅 `iRobot/`、`script.py`、`resubjob.py` 需要）。⚠️ `iRobot` 用 `distutils`，Python 3.12 起已移除 |
-| ROOT | 通过 BOSS 环境提供（`chi2FoM` 需要 `root-config`、`libCint.so`） |
-| `expect` | 仅 `xiechen/signal/auto.exp` 需要 |
+| Python | **Python 3.6+**（仅 `SubmitJobyjh/script.py`、`checktool/resubjob.py` 需要） |
+| ROOT | 通过 BOSS 环境提供（`chi2FoM` 需要 `root-config`） |
 
 ### 支持的 BOSS 版本
 
@@ -330,7 +305,7 @@ source setupBOSS <bossversion> [-silent]
 
 **用途**：BOSS 里新建一个分析算法包，需要复制几十个文件并把包名、类名、文件名、`load`/`entries` 组件名、`jobOptions` 名全部改掉。这个脚本把整套替换自动化了。
 
-**入口**：[`creatAlg`](creatalgyjh/creatAlg) → [`.creatAlg_1.02.sh`](creatalgyjh/.creatAlg_1.02.sh)
+**入口**：[`creatAlg`](creatAlgyjh/creatAlg) → [`.creatAlg_1.02.sh`](creatAlgyjh/.creatAlg_1.02.sh)
 
 **用法**：
 
@@ -364,7 +339,7 @@ source creatAlg <directory> <algName> <bossversion> [AlgVersion] [newalgName]
 **用途**：本工具箱的**主力工具**。以交互式问答的方式，把信号 MC 产生/重建/分析、inclusive MC 分析和真实数据分析的作业批量生成并提交到集群。
 
 **入口**：[`iRobot`](SubmitJobyjh/iRobot) → [`.Robot_1.00.sh`](SubmitJobyjh/.Robot_1.00.sh)（`jarvisVersion = 1.00`）。
-脚本内部与 `welcome.sh` 中自称 **jarvis**，但符号链接叫 `iRobot`，报错信息里也会提到 *Wall.E* —— 这是三代机器人命名混用的历史遗留。
+脚本内部与 `welcome.sh` 中自称 **jarvis**，报错信息里也会提到 *Wall.E* —— 见[关于"机器人"的名字](#关于机器人的名字)。
 
 **工作目录约定**：必须在同时含有 `.scripts/` 和 `txts/` 的目录下运行（通常是软链接）。脚本用 `$PWD` 作为根，自动创建 `<motherparticle><year>/` 作为数据集工作目录。
 
@@ -418,52 +393,11 @@ SetColors → welcome（自我介绍 + 检查 Linux 发行版 + 检查 BES_RELEA
 ./iRobot <year> <action> <yes|no> <MCmodel>  # 指定 MC 模型
 ```
 
-**`script.py`**（实验性）：另一套 Python 实现的作业卡生成器（`--createdir` / `--start` / `--startonedir` / `--cleanup`），内含 **51 条**硬编码数据集路径，与 `xiechen/signal/script.py` 同源但独立演化。
+**`script.py`**（实验性）：另一套 Python 实现的作业卡生成器（`--createdir` / `--start` / `--startonedir` / `--cleanup`），内含各能量点的数据集路径（公开版已改为 `DATA_ROOT` 占位符）。
 
 ---
 
-### 4. `iRobot` —— WALL·E（Python 版）
-
-**用途**：作业机器人的 Python 3 面向对象重写版，把「环境探测 / 装 BOSS / 建算法包 / 编译算法包」抽象成类。
-**状态**：⚠️ 最后一次提交为 2022-03，作业提交功能（`subjobs.py` / `resubjobs.py`）**从未实现**，其职责已由 `SubmitJobyjh` 承担，实际处于**存档状态**。
-
-**类结构**（[`iRobot/classes/`](iRobot/classes/)）：
-
-| 文件 | 类 / 职责 |
-|---|---|
-| `preferences.py` | `Preferences` —— **唯一配置源**：`workfs2`/`scratchfs`/`besfs5` 前缀、`cmthome` 与 `Boss` 的 CVMFS 路径、RHEL 代号→`SL5/SL6/SL7` 映射、容器支持标志。（旧名 `prefixes.py`，已重命名） |
-| `environments.py` | `Environments` —— 从 `os.environ` 读 `USER`/`HOME`/`SHELL`，推导各工作目录；含 `SLnickname()` 解析 `/etc/redhat-release`、`InContainer()` 等检测 |
-| `textcolor.py` | `TextColor` —— ANSI 彩色输出 |
-| `toolkit.py` | `Toolkit` —— 底层文件工具（`_makedir`、`_findfile`、`_backupfile`、`_prepare_package`、`_replace_keyword` …） |
-| `setupboss.py` | `SetupBOSS.install()` —— 安装/配置 BOSS，并生成 `boss<ver>` 与 `~/.tcshrc` 别名 |
-| `initialize.py` | `Initialize` —— 备份/安装 `~/.tcshrc` 与 `~/.vimrc`。⚠️ **当前完全不可用**（见下） |
-| `createAlgorithm.py` | `CreateAlgorithm.create()` —— 从 5 个内置模板派生算法包 |
-| `compileAlgorithm.py` | `CompileAlgorithm.compile()` —— 编译算法包 |
-| `WALLE.py` | 人格层，只有 `__init__` + `__str__`（无 `initialize()` 方法） |
-| `subjobs.py` / `resubjobs.py` | **空文件**（0 字节） |
-
-**运行模型**：宿主机的 python3 负责编排；由于「容器不支持 python3」，所有 `cmt` 操作都通过
-`os.system('hep_container exec <container> ./<script>')` 投进容器（BOSS 6 → SL5，7 → SL6）用 tcsh 执行。
-
-**CLI 入口**（[`iRobot/apps/`](iRobot/apps/)）：
-
-```bash
-python3 apps/WALLE_intro.py                                          # 自我介绍
-python3 apps/WALLE_setupboss.py   --bossversion 7.0.9                # 安装 BOSS
-python3 apps/WALLE_createAlg.py   --bossversion 7.0.9 --algname XxxAlg
-python3 apps/WALLE_compileAlg.py  --bossversion 7.0.9 --algname XxxAlg --algversion 00-00-01
-```
-
-**已知限制**：
-- `apps/*.py` 用 `sys.path.append('/workfs2/bes/zhoux/BES3Toolkit/iRobot/classes')` 这种**绝对路径**导入（`classes/` 没有 `__init__.py`），必须先改；
-- `initialize.py` 的 `initialize()` 引用了 `__init__` 中从未定义的 `self.logfile`/`self.preferences`，且第 33 行无条件 `return`，其后所有逻辑都是死代码；
-- `environments.py` 的 `SLnickname()` 只认 `Boron/Carbon/Core`，在 AlmaLinux 上会解析出错误字符串并 `KeyError`；
-- 依赖 `distutils`，Python 3.12 起不可用；
-- [`apps/run.zsh`](iRobot/apps/run.zsh) 是原作者本机的部署脚本（`rsync` 到 `ihep` 主机 + `ssh` 执行），**对使用者无用**。
-
----
-
-### 5. `checktool` —— 作业体检与重投
+### 4. `checktool` —— 作业体检与重投
 
 所有脚本**不接受命令行参数**，均在作业输出目录就地运行。
 
@@ -484,7 +418,7 @@ python3 apps/WALLE_compileAlg.py  --bossversion 7.0.9 --algname XxxAlg --algvers
 
 ---
 
-### 6. `DrawTool` —— 绘图
+### 5. `DrawTool` —— 绘图
 
 | 文件 | 说明 |
 |---|---|
@@ -513,7 +447,7 @@ root [2] .x draw.C
 
 ---
 
-### 7. `fitkit` —— 拟合
+### 6. `fitkit` —— 拟合
 
 基于 **RooFit** 的拟合模板集合，都是在真实分析中抽出来的骨架，把输入路径换掉即可用。
 输入统一为**你自己用 BOSS `ana` 作业产生的小 ntuple**（不是原始 DST/Rec）。
@@ -549,7 +483,7 @@ g++ -std=c++0x D_fit_unbin.cxx -o D_fit_unbin \
 
 ---
 
-### 8. `chi2FoM` —— χ² 扫描与 cut 优化
+### 7. `chi2FoM` —— χ² 扫描与 cut 优化
 
 **用途**：给定信号 MC 与本底 MC（或信号+本底）的 ROOT 文件，扫描一系列 χ² 上限，计算品质因子
 
@@ -606,9 +540,7 @@ bash compile.sh          # g++ -std=c++0x chi2.C -o chi2 `root-config --cflags -
 
 ---
 
-### 9. `inclusive` / `xiechen` —— 作业模板
-
-#### `inclusive/` —— 12 个能量点的 inclusive MC 分析
+### 8. `inclusive` —— 作业模板
 
 **目的**：在 ψ(3770) 扫描的 12 个能量点上，对 **22 种 exclusive 本底过程**做同一套 inclusive 分析并汇总。
 输入是**集群上已有的官方 inclusive MC DST**，本模板不产生 MC。
@@ -675,35 +607,9 @@ inclusive/<ECM>/
 - 12 个能量点之间的差异只有 5 类：`job.head` 中的 `RUN_FROM`/`RUN_TO` 与 `BeamEnergy`（= E_cm/2）、`job.foot` 的输出名前缀、`makejob.sh` 中的 `DATA_ROOT` 路径、内嵌的 `<ECM>` 字符串、以及缩进；
 - ⚠️ [`makejob.sh`](inclusive/4230/MC_01/mc1/makejob.sh) 用 `sed -i "s/D0D0/$list/g" job.foot` **就地修改模板**（脚本注释自称 *"it is a dangerous operation"*），重复运行会污染 `job.foot`。
 
-#### `xiechen/signal/` —— 信号 MC 全链生产
-
-**目的**：ψ(3770) 以上 **3φ 能量扫描**的信号 MC 产生（sim）→ 重建（rec）→ 分析（sig），覆盖 **46 个能量点**、4 个 campaign（703/705/706/707）。
-
-```bash
-python3 script.py --createdir    # 建 46 个能量点目录，替换 3phi.dec 的 ECMS、msim.txt 的 RUNNO
-./auto.exp <作业数> <每作业事例数>   # expect 脚本，自动回答 script.py --simulate 的两个提问
-python3 script.py --simulate     # 生成 sim / rec 作业卡并追加到 sub
-./generate.sh                    # 逐目录生成 sig 阶段的作业卡（nDataFile = 2）
-./sub.sh 703|705|706|707         # 按 campaign 分批提交：boss.condor -wt mid sig_3phi_0
-```
-
-| 文件 | 作用 |
-|---|---|
-| [`script.py`](xiechen/signal/script.py) | 222 行 argparse 生成器（`--createdir` / `--simulate` / `--signal` / `--cleanup`），内含 46 个能量点 × E_cm 的大表（run 区间已略去，改为 `RUN_BEGIN` / `RUN_END` 占位符）；`--simulate` 用 `random.sample(range(99999), num_jobs)` 生成随机种子 |
-| [`auto.exp`](xiechen/signal/auto.exp) | `expect` 脚本，自动喂给 `--simulate` 的两个 `input()` |
-| [`msim.txt`](xiechen/signal/msim.txt) | sim 阶段 jobOption 模板（占位符 `NUMBER`/`RUNNO`/`SIMN`/`aaaa.dec`） |
-| [`mdst.txt`](xiechen/signal/mdst.txt) | rec 阶段 jobOption 模板（PAT+TSF+HOUGH 重建链，含本底混合） |
-| [`job.head`](xiechen/signal/job.head) / [`job.foot`](xiechen/signal/job.foot) | sig 阶段 jobOption 头尾（算法硬编码为 `eeTo3phi`） |
-| [`3phi.dec`](xiechen/signal/3phi.dec) | EvtGen 衰变卡：`vpho → φφφ`（用 `ConExc` 处理 ISR），`φ → K⁺K⁻` |
-| [`xs_user.txt`](xiechen/signal/xs_user.txt) | ConExc 用的 (E_cm, 截面, 误差) 三列表，3.05→4.95 GeV，步长 0.5 MeV，共 3901 行 |
-
-#### `xiechen/inclusive/`
-
-与 [`inclusive/`](inclusive/) **逐字节完全相同**（`diff -rq` 无差异），是历史副本。
-
 ---
 
-### 10. `template_topoana.card` —— TopoAna 配置
+### 9. `template_topoana.card` —— TopoAna 配置
 
 [TopoAna](http://bes3.ihep.ac.cn/) 是 BESIII 常用的**拓扑分析**工具，用于统计 inclusive MC 中各衰变链的贡献。这个文件是它的配置文件模板（317 行）。
 
@@ -745,10 +651,8 @@ TopoAna.exe xxx.card
 | [`SubmitJobyjh/.scripts/SetBOSSVersion.sh:82-83`](SubmitJobyjh/.scripts/SetBOSSVersion.sh#L82) | `creatAlgWD` / `setupBOSSWD` | 同上 | 同上 |
 | [`SubmitJobyjh/.scripts/PrepareFilesandDirectories.sh:10`](SubmitJobyjh/.scripts/PrepareFilesandDirectories.sh#L10) | `cp .../checktool/checkjoberr.sh` | `/workfs2/bes/yangjunhui/...` | 你的路径 |
 | [`SubmitJobyjh/.scripts/compileAnalysisCode.sh:3`](SubmitJobyjh/.scripts/compileAnalysisCode.sh#L3) | `compileAlgWD` | `/afs/ihep.ac.cn/users/z/zhoux/compileAlg` | 你的 `compileAlg`（当前该脚本默认未被调用） |
-| [`creatAlgyjh/.creatAlg_1.02.sh:51-52`](creatalgyjh/.creatAlg_1.02.sh#L51) | `creatAlgWD` / `setupBOSSWD` | `/workfs2/bes/yangjunhui/...` | 你的路径 |
+| [`creatAlgyjh/.creatAlg_1.02.sh:51-52`](creatAlgyjh/.creatAlg_1.02.sh#L51) | `creatAlgWD` / `setupBOSSWD` | `/workfs2/bes/yangjunhui/...` | 你的路径 |
 | [`chi2FoM/chi2FoM:22,29`](chi2FoM/chi2FoM#L22) | `workWD` | `/workfs/bes/zhoux/chi2FoM` | 你自己编译 `chi2` 的目录 |
-| [`iRobot/classes/preferences.py:14`](iRobot/classes/preferences.py#L14) | `iRobot_dir` | `/workfs2/bes/zhoux/BES3Toolkit/iRobot` | 你的路径 |
-| [`iRobot/apps/*.py:9`](iRobot/apps/WALLE_intro.py#L9) | `sys.path.append(...)` | `/workfs2/bes/zhoux/.../classes` | 你的路径（改为相对导入更佳） |
 
 ### B. 用户名硬编码（建议改）
 
@@ -759,7 +663,6 @@ TopoAna.exe xxx.card
 | [`setupBOSSyjh/.scripts/welcome.sh:6`](setupBOSSyjh/.scripts/welcome.sh#L6) | 同上 | 仅影响问候语 |
 | [`SubmitJobyjh/.scripts/welcome.sh:7`](SubmitJobyjh/.scripts/welcome.sh#L7) | 同上 | 仅影响问候语 |
 | [`creatAlgyjh/.scripts/welcome.sh:6`](creatAlgyjh/.scripts/welcome.sh#L6) | 同上 | 仅影响问候语 |
-| [`iRobot/classes/WALLE.py:30`](iRobot/classes/WALLE.py#L30) | `if self.user == 'zhoux'` | 彩蛋式欢迎语 |
 
 ### C. 数据集路径与 Run 区间（公开版已略去，必填）
 
@@ -774,7 +677,6 @@ TopoAna.exe xxx.card
 | `inclusive/*/MC_01/mc1/job.head`（12 个） | `Int_t RUN_FROM / RUN_TO = 0` | 文件顶部改这两个常量，下方三处 `RunFrom`/`RunTo` 会自动跟随 |
 | `inclusive/*/MC_01/mc1/makejob.sh`（12 个） | `DATA_ROOT` | 设 `export DATA_ROOT=...`，或改脚本里的默认值 |
 | [`inclusive/generate.sh`](inclusive/generate.sh) | `runbegin` / `runend` | 数组值已占位（该数组仅作溯源记录，脚本未使用） |
-| [`xiechen/signal/script.py`](xiechen/signal/script.py) | `runlist` | 每个能量点一个 `'起始run, 0, 结束run'` 字符串 |
 | [`chi2FoM/Example.cfg:3-4`](chi2FoM/Example.cfg#L3) | `S` / `B` | `/path/to/your/*.root`，换成你自己的 ntuple |
 | [`fitkit/fit_1D.cxx`](fitkit/fit_1D.cxx)、[`testfit.cxx`](fitkit/testfit.cxx)、[`fit2D_test.cxx`](fitkit/fit2D_test.cxx)、[`2D_sim_fit.cxx`](fitkit/2D_sim_fit.cxx) | `/path/to/your/analysis/...` | 换成你自己的分析输出目录 |
 
@@ -787,7 +689,6 @@ TopoAna.exe xxx.card
 | [`SubmitJobyjh/.scripts/SetBOSSVersion.sh`](SubmitJobyjh/.scripts/SetBOSSVersion.sh) | 各母粒子对应的 `RunIdList` 区间（占位符） |
 | `inclusive/*/MC_01/mc1/job.head` | `mode.BeamEnergy`、`RUN_FROM`/`RUN_TO`、`UseCalibEnergy`/`ReadBeamEFromDB` |
 | `inclusive/*/MC_01/mc1/makejob.sh` | `nDataFile`（4230 为 5，其余为 6） |
-| [`xiechen/signal/xs_user.txt`](xiechen/signal/xs_user.txt) | 截面表 |
 | [`checktool/resubjob.sh:5`](checktool/resubjob.sh#L5) | `num_copies=48` |
 | [`checktool/resubjob.py`](checktool/resubjob.py)、[`checktool/countnumber.sh`](checktool/countnumber.sh) | 硬编码的数据集名前缀 `data_gamV_jpsi_2012_*`、`inc_gamV_psip_2021_*` |
 
@@ -802,36 +703,35 @@ TopoAna.exe xxx.card
 | ROOT（含 RooFit） | 绘图、拟合、`chi2FoM` | ❌ 随 BOSS 提供 |
 | `g++ >= 4.6.3`, `gmake`, `sed`, `find`, `awk` | 编译与脚本 | ✅ 系统自带 |
 | `hep_sub` / `hep_q` / `boss.condor` | 作业提交与查询（HTCondor） | ❌ IHEP 集群提供 |
-| Python 3.6+ | `iRobot/`、`script.py`、`resubjob.py` | ✅ 系统自带 |
-| `expect` | `xiechen/signal/auto.exp` | ❌ 需自行安装 |
+| Python 3.6+ | `SubmitJobyjh/script.py`、`checktool/resubjob.py` | ✅ 系统自带 |
 | TopoAna | 拓扑分析 | ❌ 需另行获取（本仓库只提供 `.card` 模板） |
 | `bes3plotstyle.{C,h}` | BESIII 绘图风格 | ✅ **随仓库提供** |
 | `RooMispartition.h` | `fitkit` 两个程序 | ❌ **缺失，见已知问题** |
 | `ana.C` / `ana.h`（用户自己的分析框架） | `DrawTool/drawtool/` | ❌ 需自备 |
-| `modeAlg` / `eeTo3phiAlg` 算法源码 | `inclusive` / `xiechen` 的分析算法 | ❌ **不在本仓库** |
+| `modeAlg` 算法源码 | `inclusive/` 的分析算法 | ❌ **不在本仓库** |
 
----
 ---
 
 ## 已知问题与后续计划
 
 ### 已知问题
 
-1. **空文件**：[`iRobot/classes/subjobs.py`](iRobot/classes/subjobs.py)、[`resubjobs.py`](iRobot/classes/resubjobs.py) 为 0 字节（作业提交功能只在 Bash 版中实现）。
-2. **`iRobot` 无法在现代 Python 上运行**：`initialize.py` 引用了未定义属性且逻辑不可达；依赖 `distutils`（Python 3.12 已移除）；`SLnickname()` 在非 RHEL6/7 系统上会 `KeyError`。
-3. **`checktool/countnumber.sh`**：shebang 缺前导 `/`；`vtx_total` 引用了未定义变量。
-4. **`SubmitJobyjh/.scripts/SubmitJobsToServer.sh`**：`yn = $answer`（等号两侧有空格）在 bash 下不是赋值，会尝试执行命令 `yn`；该分支只在传入第 3 个参数时走到。
+1. **`checktool/countnumber.sh`**：shebang 缺前导 `/`；`vtx_total` 引用了未定义变量。
+2. **`SubmitJobyjh/.scripts/SubmitJobsToServer.sh`**：`yn = $answer`（等号两侧有空格）在 bash 下不是赋值，会尝试执行命令 `yn`；该分支只在传入第 3 个参数时走到。
+3. **`chi2FoM` 的两个小瑕疵**：绘制分布图时写死 `"chi2"` 分支名，与可配置的 `chisquare` 不一致；`config` 读取的临时 `TString` 指针被长期持有（理论悬垂）。
+4. **`fitkit` 两个程序缺少 `RooMispartition.h`**，当前无法编译（见 [fitkit](#6-fitkit--拟合)）。
+5. **`inclusive/*/MC_01/mc1/makejob.sh`** 用 `sed -i` 就地修改 `job.foot`（脚本注释自认 *dangerous*），重复运行会污染模板。
+6. **`inclusive/*/MC_01/all/`** 是空目录，git 无法记录，克隆后需要手动创建。
 
 
 ### 后续计划
 
-- [ ] 把硬编码路径统一抽到单个 `config.sh` / `preferences.py`，支持环境变量覆盖；
-- [ ] 清理重复文件与三个历史版本，改由 Git 历史管理；
+- [ ] 把硬编码路径统一抽到单个 `config.sh`，支持环境变量覆盖；
+- [ ] 清理 `creatAlgyjh` 保留的三个历史版本，改由 Git 历史管理；
 - [ ] 给作业机器人增加 `--dry-run`，避免误提交；
 - [ ] 把 `inclusive/` 的 12 份重复目录改为参数化的单一模板；
 - [ ] 用 `python3` 重写 `makejob.sh` 中的 `sed -i` 逻辑，做到幂等；
 - [ ] 补齐 `fitkit` 缺失的 `RooMispartition.h`，或移除这两个程序。
-
 
 ---
 
@@ -839,10 +739,10 @@ TopoAna.exe xxx.card
 
 本工具箱是站在别人肩膀上的产物：
 
-- **Dr. ZHOU Xiang（周翔，武汉大学）** —— `iRobot/`（WALL·E）的完整 Python 框架、`chi2FoM/chi2.C` 的原始算法，以及 `setupBOSS` / `creatAlg` / `SubmitJob` 系列脚本的**最初版本**。`SubmitJobyjh`、`creatAlgyjh`、`setupBOSSyjh` 中大量脚本头部都标注了 *"modified from Dr.ZhouX's script"*。
+- **Dr. ZHOU Xiang（周翔，武汉大学）** —— `chi2FoM/chi2.C` 的原始算法，以及 `setupBOSS` / `creatAlg` / `SubmitJob` 系列脚本的**最初版本**。`SubmitJobyjh`、`creatAlgyjh`、`setupBOSSyjh` 中大量脚本头部都标注了 *"modified from Dr.ZhouX's script"*。
 - **Niklaus Berger** —— `bes3plotstyle.{C,h}` 的 BESIII 官方绘图风格。
 - **BESIII Offline Software Team** —— BOSS 框架与全部 `jobOptions_*.txt` 模板。
-- `config.hh` / `config.cc` 的通用配置解析器来自 [CSDN 博客](https://blog.csdn.net/david_xtd/article/details/9320549)，`iRobot/classes/textcolor.py` 的色号参考自 CSDN。
+- `config.hh` / `config.cc` 的通用配置解析器来自 [CSDN 博客](https://blog.csdn.net/david_xtd/article/details/9320549)。
 
 ---
 
@@ -851,12 +751,11 @@ TopoAna.exe xxx.card
 本仓库中的代码为个人科研工作中的脚本集合，**未附带任何明示或暗示的担保**。
 
 - `bes3plotstyle.{C,h}` 版权归原作者 Niklaus Berger 及 BESIII 合作组所有；
-- `iRobot/`、`chi2FoM/chi2.C` 的原始版权归 Dr. ZHOU Xiang 所有；
+- `chi2FoM/chi2.C` 的原始版权归 Dr. ZHOU Xiang 所有；
 - 其余改写部分可自由使用、修改与分发，但请**保留原始出处说明**。
-- GIt项目由大肥鱼整理完成，
+- Git 项目由大肥鱼整理完成。
 
-
-> ⚠️ **重要提醒**：本仓库面向 BESIII 合作组成员。代码中引用的数据集路径与 run 号已在公开版中略去（完整配置见 `/workfs2/bes/yangjunhui/BES3Toolkit`），但**能量点、截面数值、BOSS 版本映射等仍属合作组内部资料**，请勿将内部数据文件本身提交到公开仓库；二次分发前请确认符合 BESIII 合作组的数据与代码发布规范。
+> ⚠️ **重要提醒**：本仓库面向 BESIII 合作组成员。数据集路径与 run 号已在公开版中略去（完整配置见 `/workfs2/bes/yangjunhui/BES3Toolkit`）；但**真实的 BESIII 数据文件（`*.dst` / `*.root` / 作业日志等）不应提交到公开仓库**，二次分发前请确认符合合作组的数据与代码发布规范。
 
 ---
 
