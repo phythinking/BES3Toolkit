@@ -1,6 +1,6 @@
 # BES3Toolkit
 
-> 一套面向 **BESIII（BES3）实验** 离线数据分析的自动化工具箱。
+> 一套面向 **BESIII（BES3）实验** 离线数据分析的自动化工具箱，适合从零开始的新手一点点认识BES的分析框架和工具（毕竟也不能全依赖AI...吧）
 > 覆盖「安装 BOSS → 派生分析算法包 → 批量生产/提交作业 → 查错重投 → 绘图拟合 → cut 优化」的完整链路。
 
 ![BOSS](https://img.shields.io/badge/BOSS-6.6.4%20%7C%207.0.8%20%7C%207.0.9%20%7C%207.1.0-blue)
@@ -10,9 +10,9 @@
 
 ---
 
-> ## 📦 关于本公开版本
+> ## 📦 关于版本
 >
-> 本仓库为**公开发布版**。为遵守 BESIII 合作组的数据与代码发布规范，以下信息已被**有意移除**，
+> 本仓库为**公开发布版**。以下信息已被**有意移除**，
 > 并在代码中统一替换为占位符（`RUN_BEGIN` / `RUN_END` / `DATA_ROOT` / `/path/to/...`）：
 >
 > | 已略去 | 替换为 | 涉及文件 |
@@ -811,44 +811,17 @@ TopoAna.exe xxx.card
 | `modeAlg` / `eeTo3phiAlg` 算法源码 | `inclusive` / `xiechen` 的分析算法 | ❌ **不在本仓库** |
 
 ---
-
-## 已验证 / 未验证
-
-为避免误导，这里说明哪些部分是**实际测试过**的：
-
-**✅ 已在 ROOT 6.26.10 环境验证**
-- `fit_1D.cxx`、`fit_2D.cxx`、`testfit.cxx`、`fit2D_test.cxx`：可被解释器成功 `.L` 加载；
-- `DrawTool/draw.C`、`draw2D.C`、`extract.cxx`、`checktool/extract.cxx`：同上；
-- `chi2FoM`：`compile.sh` 编译成功，并用合成的 `fit4c` ntuple **端到端跑通**，正常生成 `chi2FoM.png` 与 `chi2Stack.png`。
-
-**❌ 未能验证**
-- `fitkit/D_fit_unbin.cxx`、`fitkit/2D_sim_fit.cxx`：因 `RooMispartition.h` 缺失，**编译失败**；
-- `DrawTool/drawtool/draw.C`：因 `ana.C` 缺失，无法单独加载；
-- 所有依赖 BOSS / `hep_container` / `cmt` / CVMFS / `/workfs2` / `/besfs*` / AFS 的脚本：这些前提在普通 Linux 机器上不存在，**未做运行验证**，结论均来自源码阅读。
-
 ---
 
 ## 已知问题与后续计划
 
 ### 已知问题
 
-1. **两份嵌套的 `.git` 目录已失效**
-   - 顶层 `.git` 与 `iRobot/.git` 都记录了**旧的目录布局**（文件原先在仓库根目录，后来被移进 `iRobot/`），`git status` 会显示大量已删除文件；两者都没有配置 `remote`；`git ls-files` 里甚至跟踪着 `__pycache__/*.pyc`。
-   - **上传到 GitHub 前建议删除这两个 `.git` 目录，重新 `git init`。**
-2. **代码重复**
-   - [`iRobot/classes/createAlgorithm.py`](iRobot/classes/createAlgorithm.py) 与 [`creatAlgorithm.py`](iRobot/classes/creatAlgorithm.py) **md5 完全相同**（`a64e8274…`），是拼写事故而非版本差异；且 `apps/WALLE_createAlg.py` 导入的是正确拼写，**`creatAlgorithm.py` 可安全删除**；
-   - `xiechen/inclusive/` 与 `inclusive/` 逐字节相同；
-   - `creatAlgyjh` 保留了 1.00 / 1.01 / 1.02 三个版本。
-3. **空文件**：[`iRobot/classes/subjobs.py`](iRobot/classes/subjobs.py)、[`resubjobs.py`](iRobot/classes/resubjobs.py) 为 0 字节（作业提交功能只在 Bash 版中实现）。
-4. **`iRobot` 无法在现代 Python 上运行**：`initialize.py` 引用了未定义属性且逻辑不可达；依赖 `distutils`（Python 3.12 已移除）；`SLnickname()` 在非 RHEL6/7 系统上会 `KeyError`。
-5. **`checktool/countnumber.sh`**：shebang 缺前导 `/`；`vtx_total` 引用了未定义变量。
-6. **`SubmitJobyjh/.scripts/SubmitJobsToServer.sh`**：`yn = $answer`（等号两侧有空格）在 bash 下不是赋值，会尝试执行命令 `yn`；该分支只在传入第 3 个参数时走到。
-7. **`inclusive/*/MC_01/mc1/makejob.sh`** 用 `sed -i` 直接修改 `job.foot`（脚本注释自认 *dangerous*），重复运行会污染模板。
-8. **`inclusive/*/MC_01/all/`** 是空目录，git 无法记录，克隆后需要手动创建。
-9. **`chi2FoM/chi2`** 原本是提交进仓库的 ELF 二进制（SL6 时代产物，依赖 `libCint.so`，现代 ROOT 下无法运行）。**公开版已删除**，请用 `compile.sh` 自行编译。
-10. **`fitkit` 两个程序缺少 `RooMispartition.h`**，当前无法编译。
-11. **`iRobot/apps/run.zsh`** 是原作者的 macOS 本机部署脚本，含 `rsync`/`ssh` 到个人主机的命令，对外部使用者无意义；且开头有 `rm -f .*`，**危险**。
-12. **`chi2.C` 的两个小瑕疵**：绘制分布图时写死 `"chi2"` 分支名；`config` 读取的临时 `TString` 指针被长期持有（理论悬垂）。
+1. **空文件**：[`iRobot/classes/subjobs.py`](iRobot/classes/subjobs.py)、[`resubjobs.py`](iRobot/classes/resubjobs.py) 为 0 字节（作业提交功能只在 Bash 版中实现）。
+2. **`iRobot` 无法在现代 Python 上运行**：`initialize.py` 引用了未定义属性且逻辑不可达；依赖 `distutils`（Python 3.12 已移除）；`SLnickname()` 在非 RHEL6/7 系统上会 `KeyError`。
+3. **`checktool/countnumber.sh`**：shebang 缺前导 `/`；`vtx_total` 引用了未定义变量。
+4. **`SubmitJobyjh/.scripts/SubmitJobsToServer.sh`**：`yn = $answer`（等号两侧有空格）在 bash 下不是赋值，会尝试执行命令 `yn`；该分支只在传入第 3 个参数时走到。
+
 
 ### 后续计划
 
@@ -859,30 +832,6 @@ TopoAna.exe xxx.card
 - [ ] 用 `python3` 重写 `makejob.sh` 中的 `sed -i` 逻辑，做到幂等；
 - [ ] 补齐 `fitkit` 缺失的 `RooMispartition.h`，或移除这两个程序。
 
-### 公开版改动记录
-
-为公开发布，本次相对内部版本做了如下处理（**共修改 62 个文件**）：
-
-**已替换为占位符**
-
-| 类别 | 占位符 | 文件 |
-|---|---|---|
-| 数据集路径 | `DATA_ROOT` / `/path/to/...` | `SubmitJobyjh/txts/.datasetpath.sh`（整文件重写为模板）、`SubmitJobyjh/script.py`（51 处）、`inclusive/*/MC_01/mc1/makejob.sh`（12）、`xiechen/inclusive/*/…/makejob.sh`（12）、`chi2FoM/Example.cfg`、`fitkit/*.cxx` |
-| Run 区间 | `RUN_BEGIN` / `RUN_END` | `SubmitJobyjh/.scripts/SetBOSSVersion.sh`（15 处 `RunIdList`）、`SubmitJobyjh/script.py`（8 个 `runFrom*`/`runTo*` 列表）、`inclusive/*/MC_01/mc1/job.head`（12）、`xiechen/inclusive/*/…/job.head`（12）、`inclusive/generate.sh` 与 `xiechen/inclusive/generate.sh` 的 `runbegin`/`runend`、`xiechen/signal/script.py` 的 `runlist` |
-
-**已删除**
-
-| 内容 | 说明 |
-|---|---|
-| 两个失效的嵌套 `.git`（顶层 + `iRobot/.git`） | 记录的是旧目录布局，且跟踪了 `__pycache__/*.pyc`；旧历史已备份为 tar.gz |
-| `chi2FoM/chi2` | ELF 编译产物 |
-| 17 个 `*~` + 4 个 `*.swp` + 2 个 `.DS_Store` + `iRobot/classes/__pycache__/` | 编辑器与系统垃圾 |
-
-**未改动（有意保留）**
-
-- 能量点（`4130`…`4230-scan`）、质心能量（`ecmenergy`、`BeamEnergy`）、`xiechen/signal/xs_user.txt` 截面表 —— 属公开信息；
-- BOSS 版本映射（母粒子 ↔ `bossversion`）；
-- 作者私有工具路径（`/workfs2/bes/yangjunhui/...`、`/workfs2/bes/zhoux/...`）；
 
 ---
 
@@ -904,6 +853,8 @@ TopoAna.exe xxx.card
 - `bes3plotstyle.{C,h}` 版权归原作者 Niklaus Berger 及 BESIII 合作组所有；
 - `iRobot/`、`chi2FoM/chi2.C` 的原始版权归 Dr. ZHOU Xiang 所有；
 - 其余改写部分可自由使用、修改与分发，但请**保留原始出处说明**。
+- GIt项目由大肥鱼整理完成，
+
 
 > ⚠️ **重要提醒**：本仓库面向 BESIII 合作组成员。代码中引用的数据集路径与 run 号已在公开版中略去（完整配置见 `/workfs2/bes/yangjunhui/BES3Toolkit`），但**能量点、截面数值、BOSS 版本映射等仍属合作组内部资料**，请勿将内部数据文件本身提交到公开仓库；二次分发前请确认符合 BESIII 合作组的数据与代码发布规范。
 
